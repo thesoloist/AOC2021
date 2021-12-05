@@ -5,6 +5,7 @@
 from Day1 import *
 from Day2 import *
 from Day3 import *
+from Day4 import *
 
 
 def print_hi(name):
@@ -24,7 +25,11 @@ if __name__ == '__main__':
     # print(f"Day 2-1 horiz({day2_horiz}) * depth({day2_depth}) = {day2_depth * day2_horiz}")
     # (day2_horiz, day2_depth) = Day2_2(day2_input_str)
     # print(f"Day 2-2 horiz({day2_horiz}) * depth({day2_depth}) = {day2_depth * day2_horiz}")
-    day3_power = day3_1(day3_input, 12)
-    print(f"Day 3-1 power = {day3_power}")
-    day3_life = day3_2(day3_input, 12)
-    print(f"Day 3-2 life support rating = {day3_life}")
+    # day3_power = day3_1(day3_input, 12)
+    # print(f"Day 3-1 power = {day3_power}")
+    # day3_life = day3_2(day3_input, 12)
+    # print(f"Day 3-2 life support rating = {day3_life}")
+    day4_score = day4_1()
+    print(f"Day 4-1 score = {day4_score}")
+    day4_score = day4_2()
+    print(f"Day 4-2 score = {day4_score}")
