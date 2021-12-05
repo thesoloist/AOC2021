@@ -2,10 +2,7 @@
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-from Day1 import *
-from Day2 import *
-from Day3 import *
-from Day4 import *
+from Day5 import *
 
 
 def print_hi(name):
@@ -29,7 +26,11 @@ if __name__ == '__main__':
     # print(f"Day 3-1 power = {day3_power}")
     # day3_life = day3_2(day3_input, 12)
     # print(f"Day 3-2 life support rating = {day3_life}")
-    day4_score = day4_1()
-    print(f"Day 4-1 score = {day4_score}")
-    day4_score = day4_2()
-    print(f"Day 4-2 score = {day4_score}")
+    # day4_score = day4_1()
+    # print(f"Day 4-1 score = {day4_score}")
+    # day4_score = day4_2()
+    # print(f"Day 4-2 score = {day4_score}")
+    day5_cross = day5(False)
+    print(f"Day 5-1 cross = {day5_cross}")
+    day5_cross = day5(True)
+    print(f"Day 5-2 cross = {day5_cross}")
