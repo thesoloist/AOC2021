@@ -2,8 +2,7 @@
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-from Day5 import *
-from Day6 import *
+from Day7 import *
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -30,11 +29,15 @@ if __name__ == '__main__':
     # print(f"Day 4-1 score = {day4_score}")
     # day4_score = day4_2()
     # print(f"Day 4-2 score = {day4_score}")
-    day5_cross = day5(False)
-    print(f"Day 5-1 cross = {day5_cross}")
-    day5_cross = day5(True)
-    print(f"Day 5-2 cross = {day5_cross}")
-    day6_count = day6(80)
-    print(f"day6_1 count = {day6_count}")
-    day6_count = day6(256)
-    print(f"day6_2 count = {day6_count}")    
+    # day5_cross = day5(False)
+    # print(f"Day 5-1 cross = {day5_cross}")
+    # day5_cross = day5(True)
+    # print(f"Day 5-2 cross = {day5_cross}")
+    # day6_count = day6(80)
+    # print(f"day6_1 count = {day6_count}")
+    # day6_count = day6(256)
+    # print(f"day6_2 count = {day6_count}")    
+    day7_fuel = day7(False)
+    print(f"day7_1 min fuel = {day7_fuel}")
+    day7_fuel = day7(True)
+    print(f"day7_2 min fuel = {day7_fuel}")
