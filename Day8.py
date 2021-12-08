@@ -282,7 +282,7 @@ def parse_input(inp):
             mapped_seg_str =''.join(sorted(mapped_seg_str))
             seg_value = pattern_seg_num_dict[mapped_seg_str]
             entry_value = entry_value * 10 + seg_value
-            print(f"entry ID {e_idx}, seg ID {s_idx}: segment \"{seg}\" value is {seg_value}, accumulated entry value = {entry_value}")
+            #print(f"entry ID {e_idx}, seg ID {s_idx}: segment \"{seg}\" value is {seg_value}, accumulated entry value = {entry_value}")
         sum_entry_value += entry_value
         
     print(f"Total count of unique segment is {unique_seg_cnt}")
