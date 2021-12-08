@@ -234,7 +234,7 @@ def parse_input(inp):
         out_arr = out_pat.split()
         day8_state.append((in_arr,out_arr))
 
- def day8():
+def day8():
     parse_input(day8_input)
     unique_seg_cnt = 0 # for day8-1
     sum_entry_value = 0 # for day8-2

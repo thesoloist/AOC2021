@@ -37,8 +37,8 @@ if __name__ == '__main__':
     # print(f"day6_1 count = {day6_count}")
     # day6_count = day6(256)
     # print(f"day6_2 count = {day6_count}")    
-    day7_fuel = day7(False)
-    print(f"day7_1 min fuel = {day7_fuel}")
-    day7_fuel = day7(True)
-    print(f"day7_2 min fuel = {day7_fuel}")
+    # day7_fuel = day7(False)
+    # print(f"day7_1 min fuel = {day7_fuel}")
+    # day7_fuel = day7(True)
+    # print(f"day7_2 min fuel = {day7_fuel}")
     day8() # prints are in function itself
