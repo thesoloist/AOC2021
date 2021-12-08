@@ -233,3 +233,57 @@ def parse_input(inp):
         in_arr = in_pat.split()
         out_arr = out_pat.split()
         day8_state.append((in_arr,out_arr))
+
+ def day8():
+    parse_input(day8_input)
+    unique_seg_cnt = 0 # for day8-1
+    sum_entry_value = 0 # for day8-2
+    
+    for e_idx, entry in enumerate(day8_state):
+        entry_value = 0
+        entry_wire_seg_map = {}
+        entry_seg_num_map = {}
+        #print(f"Processing input entry {e_idx}: {entry}")
+        # Build entry's wire-seg map
+        for c_idx, cand in enumerate(all_possible_mappings):
+            # build candidate map
+            cand_wire_seg_map = {}
+            for idx, s in enumerate(list('abcdefg')):
+                cand_wire_seg_map[s] = list(cand)[idx]
+            #print(f"Trying mapping: {cand_wire_seg_map}")
+            cand_valid = True
+            for idx, e in enumerate(entry[0]):
+                if cand_valid==False:
+                    break
+                # for each of 10 entries, see if it maps to a valid pattern
+                mapped_e = ""
+                for c in list(e):
+                    mapped_e += cand_wire_seg_map[c]
+                mapped_e = ''.join(sorted(mapped_e))
+                #print(f"Candidate #{c_idx}: Mapping entry #{idx} {e} to {mapped_e}")
+                if(mapped_e in pattern_seg_num_dict.keys()):
+                    None
+                    #print(f"Found possible match - continue...")
+                else:
+                    #print(f"Can't find possible match - discard the candidate")
+                    cand_valid = False
+            if cand_valid==True :
+                #print(f"Entry {e_idx}: Found a valid mapping at cand {c_idx}: {cand_wire_seg_map}")
+                entry_wire_seg_map = cand_wire_seg_map
+                break
+            
+        for s_idx, seg in enumerate(entry[1]):
+            if list(num_segcnt_tuple).count(len(seg)) == 1:
+                #print(f"Found a unique segment \"{seg}\", entry ID {e_idx}, seg ID {s_idx}")
+                unique_seg_cnt += 1
+            mapped_seg_str = ''
+            for c in list(seg):
+                mapped_seg_str += entry_wire_seg_map[c]
+            mapped_seg_str =''.join(sorted(mapped_seg_str))
+            seg_value = pattern_seg_num_dict[mapped_seg_str]
+            entry_value = entry_value * 10 + seg_value
+            print(f"entry ID {e_idx}, seg ID {s_idx}: segment \"{seg}\" value is {seg_value}, accumulated entry value = {entry_value}")
+        sum_entry_value += entry_value
+        
+    print(f"Total count of unique segment is {unique_seg_cnt}")
+    print(f"Sum of entry values is {sum_entry_value}")
