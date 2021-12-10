@@ -2,7 +2,7 @@
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-from Day9 import *
+from Day10 import *
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -42,4 +42,5 @@ if __name__ == '__main__':
     # day7_fuel = day7(True)
     # print(f"day7_2 min fuel = {day7_fuel}")
     #day8() # prints are in function itself
-    day9() # prints are in function itself
+    #day9() # prints are in function itself
+    day10() # prints are in function itself
