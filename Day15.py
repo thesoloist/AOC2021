@@ -1,4 +1,4 @@
-import time
+import time, math
 # Online IDE - Code Editor, Compiler, Interpreter
 
 print('Welcome to Online IDE!! Happy Coding :)')
@@ -103,104 +103,99 @@ day15_input = ['1797218461142179319573884891481221191657631838831754357117998319
 '9391973246579999241217437296325675163824334513949186691912595622177779849572792973716569959311526846',
 '4671438158382646393847419899596676468374198874175298772399482512793928838556984113933878117348995239']
 
-# day15_input = ['1163751742',
-# '1381373672',
-# '2136511328',
-# '3694931569',
-# '7463417111',
-# '1319128137',
-# '1359912421',
-# '3125421639',
-# '1293138521',
-# '2311944581']
+day15_test_input = ['1163751742',
+'1381373672',
+'2136511328',
+'3694931569',
+'7463417111',
+'1319128137',
+'1359912421',
+'3125421639',
+'1293138521',
+'2311944581']
 
 # key is point location(x, y), value is a tuple of ([array of points enroute to endpoint], risk value of said path)
-day15_safest_path_dict = {}
+def expand_map(map_in, reps):
+    in_size = len(map_in)
+    map_out = [[0]*in_size*reps for i in range(in_size*reps)]
+    for yrep in range(reps):
+        for xrep in range(reps):
+            for ridx, row in enumerate(map_in):
+                for cidx, c in enumerate(row):
+                    val = int(c) + yrep + xrep
+                    while val > 9:
+                        val -= 9
+                    map_out[yrep*in_size+ridx][xrep*in_size+cidx] = val
 
-end_pt = (len(day15_input)-1,len(day15_input)-1)
-day15_safest_path_dict[end_pt] = ''
+    return map_out
+def dijkstra(start_pt, finish_pt, input_map):
+    dist = {}
+    prev = {}
+    vertex_set = []
+    for y, row in enumerate(input_map):
+        for x, c in enumerate(row):
+            dist[(x, y)] = math.inf
+            prev[(x, y)] = []
+            vertex_set.append((x, y))
+    dist[start_pt] = 0
+    while(len(vertex_set) > 0):
+        min_dist_pt = vertex_set[0]
+        for pt in vertex_set:
+            if dist[pt] < dist[min_dist_pt]:
+                min_dist_pt = pt
+        # print(f"Got min dist pt {min_dist_pt} = {dist[min_dist_pt]}")
+        vertex_set.remove(min_dist_pt)
+        # dot_mat_size = 100
+        # dot_mat = [['.']*dot_mat_size for i in range(dot_mat_size)]
+        # for pt in vertex_set:
+        #     dot_mat[pt[1]][pt[0]] = 'X'
+        # for row in dot_mat:
+        #     print(''.join(row))
+        if min_dist_pt == finish_pt:
+            break
+        neighbors = []
+        if (min_dist_pt[0] - 1, min_dist_pt[1]) in vertex_set:
+            neighbors.append((min_dist_pt[0] - 1, min_dist_pt[1]))
+        if (min_dist_pt[0] + 1, min_dist_pt[1]) in vertex_set:
+            neighbors.append((min_dist_pt[0] + 1, min_dist_pt[1]))
+        if (min_dist_pt[0], min_dist_pt[1] - 1) in vertex_set:
+            neighbors.append((min_dist_pt[0], min_dist_pt[1] - 1))
+        if (min_dist_pt[0], min_dist_pt[1] + 1) in vertex_set:
+            neighbors.append((min_dist_pt[0], min_dist_pt[1] + 1))
+        # print(f"Trying neighbors of {min_dist_pt}: {neighbors}")
+        for pt in neighbors:
+            alt = dist[min_dist_pt] + int(input_map[pt[1]][pt[0]])
+            # print(f"neighbor {pt} is still in vertex set, existing dist={dist[pt]}, trying alt dist={alt}")
+            if alt < dist[pt]:
+                # print(f"Setting dist {pt} to {alt}, prev {pt} to {min_dist_pt}")
+                dist[pt] = alt
+                prev[pt] = min_dist_pt
+    #print(f"vertex set leftover = {len(vertex_set)}")
+    return dist, prev
 
+day15_expanded_input = expand_map(day15_input,5)
 
-def build_path(cur_pt):
-    if cur_pt[0]+1 == end_pt[0] and cur_pt[1] == end_pt[1]:
-        day15_safest_path_dict[cur_pt] = ('r', int(day15_input[end_pt[1]][end_pt[0]]))
-    elif cur_pt[0] == end_pt[0] and cur_pt[1]+1 == end_pt[1]:
-        day15_safest_path_dict[cur_pt] = ('d', int(day15_input[end_pt[1]][end_pt[0]]))
-    else:
-        #Assume point right/down are already cached
-        if cur_pt[0] == len(day15_input)-1:
-            d_pt = (cur_pt[0], cur_pt[1]+1)
-            d_val = int(day15_input[cur_pt[1]+1][cur_pt[0]]) + day15_safest_path_dict[d_pt][1]
-            # moving down
-            day15_safest_path_dict[cur_pt] = ('d'+day15_safest_path_dict[d_pt][0], d_val)
-        elif cur_pt[1] == len(day15_input)-1:
-            # can only move right
-            r_pt = (cur_pt[0]+1, cur_pt[1])
-            r_val = int(day15_input[cur_pt[1]][cur_pt[0]+1]) + day15_safest_path_dict[r_pt][1]
-            day15_safest_path_dict[cur_pt] = ('r'+day15_safest_path_dict[r_pt][0], r_val)
-        else:
-            d_pt = (cur_pt[0], cur_pt[1]+1)
-            d_val = int(day15_input[cur_pt[1]+1][cur_pt[0]]) + day15_safest_path_dict[d_pt][1]
-            r_pt = (cur_pt[0]+1, cur_pt[1])
-            r_val = int(day15_input[cur_pt[1]][cur_pt[0]+1]) + day15_safest_path_dict[r_pt][1]
-            if r_val > d_val:
-                day15_safest_path_dict[cur_pt] = ('d'+day15_safest_path_dict[d_pt][0], d_val)
-            else:
-                day15_safest_path_dict[cur_pt] = ('r'+day15_safest_path_dict[r_pt][0], r_val)
-            # moving right
+test_map_out = expand_map(day15_test_input, 5)
+#for row in test_map_out:
+#    print(row)
 
-def DFS(start, finish, boundary, visited, path, risk, max_risk):
-    next_pts = []
-    if start == finish:
-        print(f"FOUND A PATH: {path} wit risk sofar = {risk}")
-        return
-    if start[0]>0:
-        if (start[0]-1, start[1]) not in visited:
-            next_pts.append((start[0]-1, start[1])) 
-    if start[0] < boundary[0]:
-        if (start[0]+1,start[1]) not in visited:
-            next_pts.append((start[0]+1,start[1])) 
-    if start[1]>0:
-        if (start[0], start[1]-1) not in visited:
-            next_pts.append((start[0], start[1]-1)) 
-    if start[1] < boundary[1]:
-        if (start[0],start[1]+1) not in visited:
-            next_pts.append((start[0],start[1]+1)) 
-        
-    # print(f"For point({start[0],start[1]}, trying {len(next_pts)} points: {next_pts}")
-    for pt in next_pts:
-        if pt in visited:
-            continue
-        visited.append(pt)
-        path.append(pt)
-        risk += int(day15_input[pt[1]][pt[0]])
-        #print(f"trying point {pt}, risk so far = {risk}")
-        if risk < max_risk:
-            DFS(pt, finish, boundary, visited, path, risk, max_risk)
-        visited.pop(-1)
-        path.pop(-1)
-        
+size = len(day15_expanded_input)-1
+start_pt = (0, 0)
+end_pt = (size, size)
 
-# build short path map for points with distance "k" to the end. distance is defined as the sum of X difference and Y difference.
-# Assumes a square area
 start_time = time.time()
-# find the lowest risk if we only move down/right
-for dist in range(1,2*len(day15_input)-1):
-    # print(f"time={time.time() - start_time} looping for points within distance {dist} of {end_pt}")
-    for xdiff in range(len(day15_input)):
-        for ydiff in range(len(day15_input)):
-            if xdiff + ydiff == dist:
-                build_pt = (end_pt[0]-xdiff, end_pt[1]-ydiff)
-                #print(f"trying point {build_pt}")
-                build_path(build_pt)
-                break
-    # print(f"After building for dist {dist}, path dict looks like: {day15_safest_path_dict}")
-print(f"for all the shortest path(moving only right/down), safest one is {day15_safest_path_dict[(0,0)][0]} with a value of {day15_safest_path_dict[(0,0)][1]}")
+dik_dist, dik_prev = dijkstra(start_pt, end_pt, day15_expanded_input)
+cur_time = time.time()
+print(f"Dijkstra used time {cur_time - start_time}")
 
-max_risk = day15_safest_path_dict[(0,0)][1]
-
-points_visited = [(0,0)]
-path_taken = []
+u_pt = end_pt
+path_seq = []
 risk_val = 0
-DFS((0,0), (99,99), (99,99), points_visited, path_taken, risk_val, max_risk)
+if dik_prev[u_pt] != math.inf or u_pt == start_pt:
+    while len(u_pt):
+        path_seq.insert(0, u_pt)
+        risk_val += int(day15_expanded_input[u_pt[1]][u_pt[0]])
+        u_pt = dik_prev[u_pt]
+risk_val -= int(day15_expanded_input[start_pt[1]][start_pt[0]])
+print(f"15-1 dijkstra risk_val = {risk_val}")
 
