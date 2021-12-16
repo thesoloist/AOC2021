@@ -1,4 +1,6 @@
 import time, math
+import numpy as np
+import skimage.graph
 # Online IDE - Code Editor, Compiler, Interpreter
 
 print('Welcome to Online IDE!! Happy Coding :)')
@@ -179,23 +181,28 @@ test_map_out = expand_map(day15_test_input, 5)
 #for row in test_map_out:
 #    print(row)
 
-size = len(day15_expanded_input)-1
+size = len(day15_input)-1
 start_pt = (0, 0)
 end_pt = (size, size)
 
-start_time = time.time()
-dik_dist, dik_prev = dijkstra(start_pt, end_pt, day15_expanded_input)
-cur_time = time.time()
-print(f"Dijkstra used time {cur_time - start_time}")
+# start_time = time.time()
+# dik_dist, dik_prev = dijkstra(start_pt, end_pt, day15_input)
+# cur_time = time.time()
+# print(f"Dijkstra used time {cur_time - start_time}")
+#
+# u_pt = end_pt
+# path_seq = []
+# risk_val = 0
+# if dik_prev[u_pt] != math.inf or u_pt == start_pt:
+#     while len(u_pt):
+#         path_seq.insert(0, u_pt)
+#         risk_val += int(day15_input[u_pt[1]][u_pt[0]])
+#         u_pt = dik_prev[u_pt]
+# risk_val -= int(day15_input[start_pt[1]][start_pt[0]])
+# print(f"15-1 dijkstra risk_val = {risk_val}")
 
-u_pt = end_pt
-path_seq = []
-risk_val = 0
-if dik_prev[u_pt] != math.inf or u_pt == start_pt:
-    while len(u_pt):
-        path_seq.insert(0, u_pt)
-        risk_val += int(day15_expanded_input[u_pt[1]][u_pt[0]])
-        u_pt = dik_prev[u_pt]
-risk_val -= int(day15_expanded_input[start_pt[1]][start_pt[0]])
-print(f"15-1 dijkstra risk_val = {risk_val}")
-
+normal_end_pt = [len(day15_input)-1,len(day15_input)-1]
+exp_end_pt = [len(day15_expanded_input)-1,len(day15_expanded_input)-1]
+exp_wt = np.array(day15_expanded_input)
+normal_wt = np.array(expand_map(day15_input, 1))
+print(skimage.graph.route_through_array(exp_wt, [0,0], exp_end_pt, fully_connected=False, geometric=False))
