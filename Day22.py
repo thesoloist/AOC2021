@@ -1,5 +1,46 @@
+import math
 import re
 # Online IDE - Code Editor, Compiler, Interpreter
+class Box:
+    def __init__(self, id, dims, isOn, mute=False):
+        self.id = id
+        self.dims = dims
+        self.coveredState = {}
+        self.fullcovered = False
+
+        self.volume = (dims[0][1] - dims[0][0]+1)*(dims[1][1] - dims[1][0]+1)*(dims[2][1] - dims[2][0]+1)
+        if not mute:
+            print(f"Creating box of size x/y/z {dims[0][1] - dims[0][0]+1}/{dims[1][1] - dims[1][0]+1}/{dims[2][1] - dims[2][0]+1}, volume={self.volume}")
+
+    def getAxis(self,axis):
+        return range(self.dims[axis][0], self.dims[axis][1]+1)
+
+    def getSum(self):
+        Sum = 0
+        for x in self.coveredState.keys():
+            for y in self.coveredState[x].keys():
+                for z in self.coveredState[x][y].keys():
+                    Sum += self.coveredState[x][y][z]
+        return Sum
+
+    def getCover(self, other):
+        if self.dims[0][1] < other.dims[0][0] or self.dims[0][0] > other.dims[0][1]:
+            return ()
+        elif self.dims[1][1] < other.dims[1][0] or self.dims[1][0] > other.dims[1][1]:
+            return ()
+        elif self.dims[2][1] < other.dims[2][0] or self.dims[2][0] > other.dims[2][1]:
+            return ()
+        else:
+            return( (max(self.dims[0][0], other.dims[0][0]), min(self.dims[0][1], other.dims[0][1])),
+                    (max(self.dims[1][0], other.dims[1][0]), min(self.dims[1][1], other.dims[1][1])),
+                    (max(self.dims[2][0], other.dims[2][0]), min(self.dims[2][1], other.dims[2][1])) )
+
+
+    def IsInBox(self, val, axis):
+        return True if val >= self.dims[axis][0] and val <= self.dims[axis][1] else False
+
+
+
 
 print('Welcome to Online IDE!! Happy Coding :)')
 day22_input_puzzle = ['on x=-26..26,y=-40..10,z=-12..42',
@@ -525,32 +566,38 @@ def quali_range(in_range, limit_range):
         
 inst_re = r'(on|off) x=(-?\d+)\.\.(-?\d+),y=(-?\d+)\.\.(-?\d+),z=(-?\d+)\.\.(-?\d+)'
 
-def find_range(input_insts):
-    x_min, x_max, y_min, y_max, z_min, z_max = 0,0,0,0,0,0
-    for inst in day22_input_reboot:
-        result = re.match(inst_re, inst)
-        # print(result.groups())
-        inst_box = ((int(str(result.group(2))), int(str(result.group(3)))), (int(str(result.group(4))), int(str(result.group(5)))), (int(str(result.group(6))), int(str(result.group(7)))))
-        assert inst_box[0][0] < inst_box[0][1]
-        if(inst_box[0][0] < x_min):
-            x_min = inst_box[0][0]
-        if(inst_box[0][1] > x_max):
-            x_max = inst_box[0][1]
-        assert inst_box[1][0] < inst_box[1][1]
-        if(inst_box[1][0] < y_min):
-            y_min = inst_box[1][0]
-        if(inst_box[1][1] > y_max):
-            y_max = inst_box[1][1]
-        assert inst_box[2][0] < inst_box[2][1]
-        if(inst_box[2][0] < z_min):
-            z_min = inst_box[2][0]
-        if(inst_box[2][1] > z_max):
-            z_max = inst_box[2][1]
-    return((x_min, x_max), (y_min, y_max), (z_min, z_max))
-    
+def find_range(inst):
+    result = re.match(inst_re, inst)
+    # print(result.groups())
+    inst_box = ((int(str(result.group(2))), int(str(result.group(3)))), (int(str(result.group(4))), int(str(result.group(5)))), (int(str(result.group(6))), int(str(result.group(7)))))
+    assert inst_box[0][0] < inst_box[0][1]
+    assert inst_box[1][0] < inst_box[1][1]
+    assert inst_box[2][0] < inst_box[2][1]
+    light = True if result.group(1) == 'on' else False
+    return(light, inst_box)
+
+def find_state_range(state):
+    x_min, x_max, y_min, y_max, z_min, z_max = 0, 0, 0, 0, 0, 0
+    for x in state.keys():
+        if x < x_min:
+            x_min = x
+        if x > x_max:
+            x_max = x
+        for y in state[x].keys():
+            if y < y_min:
+                y_min = y
+            if y > y_max:
+                y_max = y
+            for z in state[x][y].keys():
+                if z < z_min:
+                    z_min = z
+                if z > z_max:
+                    z_max = z
+    return ((x_min, x_max), (y_min, y_max), (z_min, z_max))
+
+
 # 3d dict, x->y->z
 range_box = ((-50,50),(-50,50),(-50,50))
-#range_box = find_range(day22_input_reboot)
 print(f"Range is: {range_box}")
 day22_state = {}
 # for x in range(range_box[0][0],range_box[0][1]+1):
@@ -560,37 +607,71 @@ day22_state = {}
 #         for z in range(range_box[2][0],range_box[2][1]+1):
 #             day22_state[x][y][z] = 0
 
-for inst in day22_input_reboot:
-    result = re.match(inst_re, inst)
-    # print(result.groups())
-    inst_box = ((int(str(result.group(2))), int(str(result.group(3)))), (int(str(result.group(4))), int(str(result.group(5)))), (int(str(result.group(6))), int(str(result.group(7)))))
-    # print(f"Got inst for {inst_box}")
-    quali_box = []
-    if quali_range(inst_box[0], range_box[0])[0] == 1:
-        quali_box.append(quali_range(inst_box[0], range_box[0])[1])
-        if quali_range(inst_box[1], range_box[1])[0] == 1:
-            quali_box.append(quali_range(inst_box[1], range_box[1])[1])
-            if quali_range(inst_box[2], range_box[2])[0] == 1:
-                quali_box.append(quali_range(inst_box[2], range_box[2])[1])
-                #print(f"Box is in at {quali_box}, setting to {result.group(1)}")
-                for x in range(quali_box[0][0], quali_box[0][1]+1):
-                    if x not in day22_state.keys():
-                        day22_state[x] = {}
-                    for y in range(quali_box[1][0], quali_box[1][1]+1):
-                        if y not in day22_state[x].keys():
-                            day22_state[x][y] = {}
-                        for z in range(quali_box[2][0], quali_box[2][1]+1):
-                            if z not in day22_state[x][y].keys():
-                                day22_state[x][y][z] = 0
-                            day22_state[x][y][z] = 1 if result.group(1) == 'on' else 0
-                            #print(f"set state xyz={x}/{y}/{z} = {day22_state[x][y][z]}")
+# for inst in day22_input_reboot:
+#     result = re.match(inst_re, inst)
+#     # print(result.groups())
+#     inst_box = ((int(str(result.group(2))), int(str(result.group(3)))), (int(str(result.group(4))), int(str(result.group(5)))), (int(str(result.group(6))), int(str(result.group(7)))))
+#     print(f"Got inst for {inst_box}")
+#     # range_box = find_state_range(day22_state)
+#     # print(f"Range box = {range_box}")
+#     quali_box = []
+#     if quali_range(inst_box[0], range_box[0])[0] == 1:
+#         quali_box.append(quali_range(inst_box[0], range_box[0])[1])
+#         if quali_range(inst_box[1], range_box[1])[0] == 1:
+#             quali_box.append(quali_range(inst_box[1], range_box[1])[1])
+#             if quali_range(inst_box[2], range_box[2])[0] == 1:
+#                 quali_box.append(quali_range(inst_box[2], range_box[2])[1])
+#                 print(f"Box is in at {quali_box}, setting to {result.group(1)}")
+#                 for x in range(quali_box[0][0], quali_box[0][1]+1):
+#                     if x not in day22_state.keys():
+#                         day22_state[x] = {}
+#                     for y in range(quali_box[1][0], quali_box[1][1]+1):
+#                         if y not in day22_state[x].keys():
+#                             day22_state[x][y] = {}
+#                         for z in range(quali_box[2][0], quali_box[2][1]+1):
+#                             if z not in day22_state[x][y].keys() and result.group(1) == 'on':
+#                                 day22_state[x][y][z] = 1
+#                             elif z in day22_state[x][y].keys() and result.group(1) == 'off':
+#                                 day22_state[x][y].pop(z, None)
+#
+# cube_on_cnt = 0
+# for x in day22_state.keys():
+#     for y in day22_state[x].keys():
+#         for z in day22_state[x][y].keys():
+#             cube_on_cnt += day22_state[x][y][z]
+#
+#print(cube_on_cnt)
 
-cube_on_cnt = 0
-for x in day22_state.keys():
-    for y in day22_state[x].keys():
-        for z in day22_state[x][y].keys():
-            cube_on_cnt += day22_state[x][y][z]
-print(cube_on_cnt)
-        
-        
-        
+ins = []
+xs = []
+ys = []
+zs = []
+
+for line in day22_input_puzzle:
+    status, positions = line.split()
+    x, y, z = positions.split(",")
+    x1, x2 = map(int, x.split("=")[1].split(".."))
+    y1, y2 = map(int, y.split("=")[1].split(".."))
+    z1, z2 = map(int, z.split("=")[1].split(".."))
+    ins.append((status == "on", (x1, x2), (y1, y2), (z1, z2)))
+    xs.extend([x1, x2 + 1])
+    ys.extend([y1, y2 + 1])
+    zs.extend([z1, z2 + 1])
+
+ins.reverse()
+xs.sort()
+ys.sort()
+zs.sort()
+
+count = 0
+
+for x1, x2 in zip(xs, xs[1:]):
+    print(f"x={x1}")
+    ins_x = [(a, x, y, z) for a, x, y, z in ins if x[0] <= x1 <= x[1]]
+    for y1, y2 in zip(ys, ys[1:]):
+        ins_y = [(a, x, y, z) for a, x, y, z in ins_x if y[0] <= y1 <= y[1]]
+        for z1, z2 in zip(zs, zs[1:]):
+            if next((a for a, x, y, z in ins_y if z[0] <= z1 <= z[1]), False):
+                count += (x2 - x1) * (y2 - y1) * (z2 - z1)
+
+print(count)
